@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body background="https://emerging-europe.com/wp-content/uploads/2017/03/bigstock-127675037-1-copy-990x556.jpg">
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script  src="http://www.gstatic.com/firebasejs/live/3.1/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+     
+<script>
+       // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCd7LZx3y20bTYUuZBNcIW-z9QOypcqG3M",
+    authDomain: "casa-empeno-6b045.firebaseapp.com",
+    databaseURL: "https://casa-empeno-6b045.firebaseio.com",
+    projectId: "casa-empeno-6b045",
+    storageBucket: "casa-empeno-6b045.appspot.com",
+    messagingSenderId: "636062793887",
+    appId: "1:636062793887:web:f8737a85a20840533322aa"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+
+  var dataDB= firebase.database().ref();
+
+  
+  var refDB= firebase.database().ref().child('prendas');
+  refDB.on('value', gotData, errData);  
+
+
+// ********** CLIENTES EN BARRITA 1*************
+
+  var dataDB_chido= firebase.database().ref('prendas');
+  var prendasChidas= {}; 
+
+    dataDB_chido.on('value', function(datos){
+        //alert('que onda');
+        prendasChidas = datos.val(); //Guarda cada usuario junto a sus datos
+        var select = document.getElementById('prendasBarra');
+
+        var keys= Object.keys(prendasChidas);
+
+        for(let i=0; i<keys.length; i++){
+            var k= keys[i]; 
+
+            var option = document.createElement("option");
+            option.setAttribute("value", k); //indice es el id del usuario
+            option.setAttribute("label", k);
+            
+            select.appendChild(option);
+        }
+
+    });
+            
+
+// ********** CLIENTES EN BARRITA 1 *************
+
+// ********** CLIENTES EN BARRITA 2*************
+
+var dataDB_chido= firebase.database().ref('prendas');
+  var prendasLocas= {}; 
+
+    dataDB_chido.on('value', function(datos){
+        //alert('que onda');
+        prendasLocas = datos.val(); //Guarda cada usuario junto a sus datos
+        var select = document.getElementById('prendasBarra2');
+
+        var keys= Object.keys(prendasLocas);
+
+        for(let i=0; i<keys.length; i++){
+            var k= keys[i]; 
+
+            var option = document.createElement("option");
+            option.setAttribute("value", k); //indice es el id del usuario
+            option.setAttribute("label", k);
+            
+            select.appendChild(option);
+        }
+
+    });
+            
+
+// ********** CLIENTES EN BARRITA 2 *************
+
+
+var prendas= {}; 
+
+function gotData(data){
+    var prendas= data.val(); 
+    var keys= Object.keys(prendas); 
+    for(let i=0; i<keys.length; i++){
+        var k= keys[i]; 
+        var descripcion= prendas[k].descripcion;
+        var precio= prendas[k].precio; 
+
+        var tBody= document.getElementById('dataTable').lastElementChild;
+        
+        var tr1= document.createElement('tr');
+        tBody.appendChild(tr1);
+        
+        var dato1=document.createElement('td');
+        dato1.innerText= descripcion; 
+        tr1.appendChild(dato1);
+
+        var dato2=document.createElement('td');
+        dato2.innerText= precio; 
+        tr1.appendChild(dato2);
+
+        var dato3=document.createElement('td');
+        dato3.innerText= k;
+        tr1.appendChild(dato3);     
+    
+    }
+}
+function errData(err){
+    console.log('error');
+    console.log(err);
+}
+
+    
+
+
+
+function insertar(){
+    //var codigo = document.getElementById('codigo');
+
+  
+  var olo= dataDB.child('prendas'); 
+
+  var oli= olo.push(); 
+
+  var descripción= document.getElementById('descripcion');
+  var precio= document.getElementById('precio');
+ 
+  
+  oli.set({
+    descripcion: descripcion.value, 
+    precio: precio.value
+  });
+
+  alert('Nuevo producto a la venta');
+}
+
+
+function buscar(prenda)
+{
+	if(prenda != '')
+	{
+
+	refDB.orderByChild('descripcion').equalTo(prenda).limitToFirst(1).on('value',function(datos)
+	{
+		  $("tbody").children().remove();
+	    prendas1=datos.val();
+	    // Recorremos los productos y los mostramos
+	    $.each(prendas1, function(indice,valor)
+	    {
+	        var tBody = document.getElementById('dataTable').lastElementChild;
+	        var tr1 = document.createElement('tr');
+	        tBody.appendChild(tr1);
+	        var prevProducto='<td>'+valor.descripcion+'</td>';
+	        prevProducto+='<td>'+valor.precio+'</td>';
+	        prevProducto+='<td>'+indice+'</td>';	       
+	        $(prevProducto).appendTo(tr1);            
+
+	    });
+
+	},function(objetoError){
+	    console.log('Error de lectura:'+objetoError.code);
+	});
+}
+else{
+	ver();
+}
+}
+
+function borrar(id){
+
+
+    
+    refDB.child(id).remove();
+    
+    alert('prenda eliminada');
+}
+
+
+function actualizar(prendaId){
+        
+    var descripcion2= document.getElementById('descripcion2');
+    var precio2= document.getElementById('precio2');
+    
+    
+    firebase.database().ref().child('prendas/'+prendaId).set({
+        descripcion: descripcion2.value, 
+        precio: precio2.value          
+    });
+
+        
+    alert('infomación de prenda actualizada')
+    location.reload();
+}
+
+
+
+</script>
+
+    
+
+    <center>
+
+        <h1>Lista de prendas</h1>
+
+        <input type="text" placeholder="inserte nombre de prenda" id="nombrePrenda" name="nombrePrenda">
+        <button id="submit_button" type="submit" onclick="buscar(nombrePrenda.value)">Buscar</button><br> <br>    
+
+
+        <table id="dataTable" border="1" width="800" class="table table-dark">
+            <thead>            
+                <th>descripción</th> 
+                <th>precio</th>
+                <th>clave</th>                    
+            </thead>
+
+            <tbody>
+
+            </tbody>
+        </table>
+        <br><br>
+       
+    <select id="prendasBarra" name="prendasBarra">
+        <option value="0">Elige una prenda</option>
+    </select>
+    
+
+    <button id="submit_button" type="button" onclick="borrar(prendasBarra.value)">borrar prenda</button>
+        <br><br><br>
+
+
+        <h1>Insertar prendas</h1>
+        <form method="POST">
+            <!--<input type="text" id="codigo" class="imput" value="" placeholder="Inserte codigo" required> <br> <br> -->
+            <input type="text" id="descripcion" class="imput" value="" placeholder="Inserte descripción" required> <br> <br>
+            <input type="text" id="precio" class="input" value="" placeholder="Inserte su precio" required> <br> <br>            
+            <button id="submit_button" type="submit" onclick="insertar()" >insertar prenda</button>
+        </form>
+
+        <br><br><br>
+        <h1>Actualizar información de prenda</h1>        
+
+        <select id="prendasBarra2" name="prendasBarra2">
+            <option value="0">Elige la clave de la prenda</option>
+        </select>
+        <br><br>
+
+        <form method="POST">
+            <!--<input type="text" id="codigo" class="imput" value="" placeholder="Inserte codigo" required> <br> <br> -->
+            <input type="text" id="descripcion2" class="imput" value="" placeholder="Inserte descripción" required> <br> <br>
+            <input type="text" id="precio2" class="input" value="" placeholder="Inserte su precio" required> <br> <br>   
+            <button id="submit_button" type="submit" onclick="actualizar(prendasBarra2.value)">Actualizar información</button>
+        </form>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </center>
+    
+
+</body>
+</html>

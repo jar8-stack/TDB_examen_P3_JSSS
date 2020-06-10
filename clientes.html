@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body background="https://thumbnails.expedia.com/Hc735aXmW7bKcWXES2EaXKBhVLs=/536x384/smart/filters:quality(60)/thumbnails.expedia.com/yb_OUf_-v16bIIFCspTd8Tr4_wQ=/cs-content-hub.s3-website-us-west-2.amazonaws.com/fullimages/dc9d7fb073c6ec2a362c1ad21d039fed.jpeg">
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script  src="http://www.gstatic.com/firebasejs/live/3.1/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+     
+<script>
+       // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCd7LZx3y20bTYUuZBNcIW-z9QOypcqG3M",
+    authDomain: "casa-empeno-6b045.firebaseapp.com",
+    databaseURL: "https://casa-empeno-6b045.firebaseio.com",
+    projectId: "casa-empeno-6b045",
+    storageBucket: "casa-empeno-6b045.appspot.com",
+    messagingSenderId: "636062793887",
+    appId: "1:636062793887:web:f8737a85a20840533322aa"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+
+  var dataDB= firebase.database().ref();
+  var refDB= firebase.database().ref().child('clientes');
+  refDB.on('value', gotData, errData);  
+
+
+// ********** CLIENTES EN BARRITA 1*************
+
+  var dataDB_chido= firebase.database().ref('clientes');
+  var clientesChidos= {}; 
+
+    dataDB_chido.on('value', function(datos){
+        //alert('que onda');
+        clientesChidos = datos.val(); //Guarda cada usuario junto a sus datos
+        var select = document.getElementById('clientesBarra');
+
+        var keys= Object.keys(clientesChidos);
+
+        for(let i=0; i<keys.length; i++){
+            var k= keys[i]; 
+
+            var option = document.createElement("option");
+            option.setAttribute("value", k); //indice es el id del usuario
+            option.setAttribute("label", k);
+            
+            select.appendChild(option);
+        }
+
+    });
+            
+
+// ********** CLIENTES EN BARRITA 1 *************
+
+// ********** CLIENTES EN BARRITA 2*************
+
+var dataDB_chido= firebase.database().ref('clientes');
+  var clientesChidos= {}; 
+
+    dataDB_chido.on('value', function(datos){
+        //alert('que onda');
+        clientesChidos = datos.val(); //Guarda cada usuario junto a sus datos
+        var select = document.getElementById('clientesBarra2');
+
+        var keys= Object.keys(clientesChidos);
+
+        for(let i=0; i<keys.length; i++){
+            var k= keys[i]; 
+
+            var option = document.createElement("option");
+            option.setAttribute("value", k); //indice es el id del usuario
+            option.setAttribute("label", k);
+            
+            select.appendChild(option);
+        }
+
+    });
+            
+
+// ********** CLIENTES EN BARRITA 2 *************
+
+
+function gotData(data){
+    var clientes= data.val(); 
+    var keys= Object.keys(clientes); 
+    for(let i=0; i<keys.length; i++){
+        var k= keys[i]; 
+        var apellido= clientes[k].apellido; 
+        var nombre= clientes[k].nombre; 
+        var telefono= clientes[k].telefono; 
+        var tBody= document.getElementById('dataTable').lastElementChild;
+        
+        var tr1= document.createElement('tr');
+        tBody.appendChild(tr1);
+        
+        var dato1=document.createElement('td');
+        dato1.innerText= apellido; 
+        tr1.appendChild(dato1);
+
+        var dato2=document.createElement('td');
+        dato2.innerText= nombre; 
+        tr1.appendChild(dato2);
+
+        var dato3=document.createElement('td');
+        dato3.innerText= telefono;
+        tr1.appendChild(dato3);     
+
+        var dato4= document.createElement('td');
+        dato4.innerText= k; 
+        tr1.appendChild(dato4)
+    }
+}
+function errData(err){
+    console.log('error');
+    console.log(err);
+}
+
+function buscar(usuario)
+{
+	if(usuario != '')
+	{
+
+	refDB.orderByChild('nombre').equalTo(usuario).limitToFirst(1).on('value',function(datos)
+	{
+		  $("tbody").children().remove();
+	    usuarios=datos.val();
+	    // Recorremos los productos y los mostramos
+	    $.each(usuarios, function(indice,valor)
+	    {
+	        var tBody = document.getElementById('dataTable').lastElementChild;
+	        var tr1 = document.createElement('tr');
+	        tBody.appendChild(tr1);
+	        var prevProducto='<td>'+valor.apellido+'</td>';
+	        prevProducto+='<td>'+valor.nombre+'</td>';
+	        prevProducto+='<td>'+valor.telefono+'</td>';	        
+            prevProducto+='<td>'+indice+'</td>';
+	        $(prevProducto).appendTo(tr1);
+
+	    });
+
+	},function(objetoError){
+	    console.log('Error de lectura:'+objetoError.code);
+	});
+}
+else{
+	gotData();
+}
+}
+
+
+function insertar(){
+    //var codigo = document.getElementById('codigo');
+
+  
+  var olo= dataDB.child('clientes'); 
+
+  var oli= olo.push(); 
+
+  var apellido= document.getElementById('apellido');
+  var nombre= document.getElementById('nombre');
+  var telefono= document.getElementById('telefono');
+  
+  oli.set({
+    apellido: apellido.value, 
+    nombre: nombre.value, 
+    telefono: telefono.value
+  });
+
+  alert('Felicidades te has registrado');
+}
+
+
+
+
+
+function borrar(id){
+
+
+    
+    refDB.child(id).remove();
+    
+    alert('cliente eliminado');
+}
+
+
+function actualizar(clienteId){
+        
+    var apellido2= document.getElementById('apellido2');
+    var nombre2= document.getElementById('nombre2');
+    var telefono2= document.getElementById('telefono2');
+    
+    firebase.database().ref().child('clientes/'+clienteId).set({
+        apellido: apellido2.value, 
+        nombre: nombre2.value, 
+        telefono: telefono2.value        
+    });
+
+        
+    alert('infomación actualizada actualizada')
+    location.reload();
+}
+
+var dataDBjiji = firebase.database().ref('clientes');
+function buscarNombre(nombre){
+    
+}
+
+</script>
+
+    
+
+    <center>
+
+        <h1>Lista de clientes</h1>
+
+        <input type="text" placeholder="inserte nombre de usuario" id="nombreUser" name="nombreUser">
+        <button id="submit_button" type="submit" onclick="buscar(nombreUser.value)">Buscar</button><br> <br>    
+
+        <table id="dataTable" border="1" width="800" class="table table-dark">
+            <thead>            
+                <th>apellido</th> 
+                <th>nombre</th>
+                <th>telefono</th>    
+                <th>codigo</th> 
+            </thead>
+
+            <tbody>
+
+            </tbody>
+        </table>
+        <br><br>
+       
+    <select id="clientesBarra" name="clientesBarra">
+        <option value="0">Elige un cliente</option>
+    </select>
+    
+
+    <button id="submit_button" type="button" onclick="borrar(clientesBarra.value)">borrar cliente</button>
+        <br><br><br>
+
+
+        <h1>Insertar clientes</h1>
+        <form method="POST">
+            <!--<input type="text" id="codigo" class="imput" value="" placeholder="Inserte codigo" required> <br> <br> -->
+            <input type="text" id="apellido" class="imput" value="" placeholder="Inserte apellido" required> <br> <br>
+            <input type="text" id="nombre" class="input" value="" placeholder="Inserte su nombre" required> <br> <br>
+            <input type="number" id="telefono" class="input" value="" placeholder="Inserte telefono propio" required> <br> <br>
+            <button id="submit_button" type="submit" onclick="insertar()">Registrarte</button>
+        </form>
+
+        <br><br><br>
+        <h1>Actualizar información personal</h1>        
+
+        <select id="clientesBarra2" name="clientesBarra2">
+            <option value="0">Elige tu clave</option>
+        </select>
+        <br><br>
+
+        <form method="POST">
+            <!--<input type="text" id="codigo" class="imput" value="" placeholder="Inserte codigo" required> <br> <br> -->
+            <input type="text" id="apellido2" class="imput" value="" placeholder="Inserte apellido" required> <br> <br>
+            <input type="text" id="nombre2" class="input" value="" placeholder="Inserte su nombre" required> <br> <br>
+            <input type="number" id="telefono2" class="input" value="" placeholder="Inserte telefono propio" required> <br> <br>
+            <button id="submit_button" type="submit" onclick="actualizar(clientesBarra2.value)">Registrarte</button>
+        </form>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </center>
+    
+
+</body>
+</html>

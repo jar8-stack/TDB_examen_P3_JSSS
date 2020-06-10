@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venta de productos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body background="https://cdn.cnn.com/cnnnext/dam/assets/170705104512-montenegro-card.jpg">
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script  src="http://www.gstatic.com/firebasejs/live/3.1/firebase.js"></script>
+
+     
+<script>
+       // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCd7LZx3y20bTYUuZBNcIW-z9QOypcqG3M",
+    authDomain: "casa-empeno-6b045.firebaseapp.com",
+    databaseURL: "https://casa-empeno-6b045.firebaseio.com",
+    projectId: "casa-empeno-6b045",
+    storageBucket: "casa-empeno-6b045.appspot.com",
+    messagingSenderId: "636062793887",
+    appId: "1:636062793887:web:f8737a85a20840533322aa"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  
+
+  var dataDB_chido= firebase.database().ref('clientes');
+  var clientesChidos= {}; 
+
+    dataDB_chido.on('value', function(datos){
+        //alert('que onda');
+        clientesChidos = datos.val(); //Guarda cada usuario junto a sus datos
+        var select = document.getElementById('clientesBarra');
+
+        var keys= Object.keys(clientesChidos);
+
+        for(let i=0; i<keys.length; i++){
+            var k= keys[i]; 
+
+            var option = document.createElement("option");
+            option.setAttribute("value", k); //indice es el id del usuario
+            option.setAttribute("label", clientesChidos[k].nombre);
+            
+            select.appendChild(option);
+        }
+
+    });
+
+
+// ************ aqui se desafia la realidad :v *************
+
+
+var dataDB_chido= firebase.database().ref('prendas');
+var prendasChidas= {}; 
+
+for(let i=0; i<3; i++){
+    dataDB_chido.on('value', function(datos){
+    //alert('que onda');
+    prendasChidas = datos.val(); //Guarda cada usuario junto a sus datos
+    var select = document.getElementById('prenda_'+(i+1));
+    var keys= Object.keys(prendasChidas);
+    for(let i=0; i<keys.length; i++){
+        var k= keys[i]; 
+        var option = document.createElement("option");
+        option.setAttribute("value", k); //indice es el id del usuario
+        option.setAttribute("label", prendasChidas[k].descripcion);
+        
+        select.appendChild(option);
+    }
+    });
+}
+
+
+
+
+// ************ aqui se desafia la realidad :v *************
+
+
+
+var dataDBP = firebase.database().ref('prendas');
+
+
+function getPrecio(prendaX, precioX){
+    document.getElementById(precioX).value=""; 
+
+    var prenda= dataDBP.child(prendaX); 
+    prenda.on('value', function(data){
+        var prend= data.val(); 
+        document.getElementById(precioX).value= prend.precio; 
+    });
+}
+
+function calcularImporte(){
+    var num1= parseInt(document.getElementById('precio_1').value);
+    var num2= parseInt(document.getElementById('precio_2').value);
+    var num3= parseInt(document.getElementById('precio_3').value);
+
+    let arr= [num1, num2, num3];
+
+    var total=0; 
+
+    for(let i=0; i<3; i++){
+        if(isNaN(arr[i]) === false){
+            total+=arr[i]; 
+        }
+    }
+
+    return total;
+
+}
+
+
+function numArtiulos(){
+    var art1= document.getElementById('precio_1');
+    var art2= document.getElementById('precio_2');
+    var art3= document.getElementById('precio_3');
+
+    let arr = [art1.value, art2.value, art3.value];
+
+    let cont=0; 
+
+    for(let i=0; i<arr.length; i++){
+        if(arr[i]!=''){
+            cont++; 
+        }
+    }
+    
+    return(cont);
+}
+
+
+var dataDBjaja= firebase.database().ref();
+
+function guardarEmpeño(){
+
+    var olo= dataDBjaja.child('Empeño_Prenda');
+    var oli= olo.push(); 
+
+    var numero_articulos= numArtiulos(); 
+    var totalChido= calcularImporte(); 
+
+    oli.set({
+        numero_articulos: numero_articulos, 
+        importe_prestamo: totalChido
+    });
+
+
+    alert('Empeño guardado');
+}
+
+var dataDB = firebase.database().ref('clientes');
+function insertarEmpeño(){
+    //Generar la fecha del sistema
+    var d = new Date();
+    var m = d.getMonth() + 1;
+    var mes = (m<10)?'0'+m:m;
+    
+    var fechag = d.getFullYear() + "-" + mes + "-" + d.getDate();
+    var cliente= document.getElementById('clientesBarra'); 
+    var importeTotal= calcularImporte(); 
+
+
+
+    //Guardando la venta. Si no existe, crea la subcolección dentro del usuario
+    dataDB.child(cliente.value).child('Empeños').push({        
+        fecha: fechag        
+    });
+
+    alert('Empeño registrado exitosamente');
+}
+
+</script>
+
+    <center>
+
+    <h1>Realizar empeño</h1>
+
+    <h4>Ingrese el usuario</h4>    
+    <select id="clientesBarra" name="clientesBarra" class="form-control form-control-sm">
+        <option value="0">Elige un cliente</option>
+    </select>
+
+    <h3>Dettalles del empeño</h3>
+    <table>
+        <thead>
+            <th>Productos</th>            
+            <th>Precio</th>            
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>
+                    <select id="prenda_1" onchange="getPrecio(this.value,'precio_1')">
+                        <option value="0">Elige una prenda</option>
+                    </select>
+                </td>                
+                <td>
+                    <input type="number" id="precio_1">
+                </td>                
+            </tr>
+
+            <tr>
+                <td>
+                    <select id="prenda_2" onchange="getPrecio(this.value,'precio_2')">
+                        <option value="0">Elige una prenda</option>
+                    </select>
+                </td>                
+                <td>
+                    <input type="number" id="precio_2">
+                </td>                
+            </tr>
+
+            <tr>
+                <td>
+                    <select id="prenda_3" onchange="getPrecio(this.value,'precio_3')">
+                        <option value="0">Elige una prenda</option>
+                    </select>
+                </td>                
+                <td>
+                    <input type="number" id="precio_3">
+                </td>                
+            </tr>
+            
+        </tbody>
+    </table>
+
+    <br><br>
+    <button id="submit_button" type="submit" onclick="insertarEmpeño()">Iniciar empeño</button> 
+    <button id="submit_button" type="submit" onclick="guardarEmpeño()">Guardar empeño</button>
+
+    </center>
+</body>
+</html>
